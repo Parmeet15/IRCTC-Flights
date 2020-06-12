@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+    <body onload="initialize()">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <style>
+            /* Always set the map height explicitly to define the size of the div
+             * element that contains the map. */
+            #map {
+                height: 100%;
+            }
+            /* Optional: Makes the sample page fill the window. */
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #floating-panel {
+                position: absolute;
+                top: 10px;
+                left: 25%;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+                border: 1px solid #999;
+                text-align: center;
+                font-family: 'Roboto','sans-serif';
+                line-height: 30px;
+                padding-left: 10px;
+            }
+            #floating-panel {
+                position: absolute;
+                top: 5px;
+                left: 50%;
+                margin-left: -180px;
+                width: 350px;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+                border: 1px solid #999;
+            }
+            #latlng {
+                width: 225px;
+            }
+        </style>
+    </head>
+    <script>
+        var lat1, lng1;
+        function initialize()
+        {
+            var markers = [];
+            var map = new google.maps.Map(document.getElementById('map'), {
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                zoom: 15
+            });
+
+            var defaultBounds = new google.maps.LatLngBounds(
+                    new google.maps.LatLng(31.6340, 74.8723),
+                    new google.maps.LatLng(31.5604, 75.0290));
+            map.fitBounds(defaultBounds);
+
+            // Create the search box and link it to the UI element.
+            var input = document.getElementById('map_location');
+            var searchBox = new google.maps.places.SearchBox(input);
+
+
+            // Listen for the event fired when the user selects an item from the
+            // pick list. Retrieve the matching places for that item.
+            google.maps.event.addListener(searchBox, 'places_changed', function () {
+                var places = searchBox.getPlaces();
+                for (var i = 0; marker; i++) {
+                    marker = markers[i];
+                    marker.setMap(null);
+                }
+                // For each place, get the icon, place name, and location.
+                markers = [];
+                var bounds = new google.maps.LatLngBounds();
+                for (var i = 0, place; place = places[i]; i++) {
+                    var image = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(50, 50)
+                    };
+
+                    // Create a marker for each place.
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        icon: image,
+                        title: place.name,
+                        position: place.geometry.location
+                    });
+
+                    markers.push(marker);
+                    var mylati = place.geometry.location.lat();
+                    var mylnongi = place.geometry.location.lng();
+                    myMap(mylati, mylnongi);
+                    document.getElementById("mylati").value = mylati;
+                    document.getElementById("mylongi").value = mylnongi;
+                    bounds.extend(place.geometry.location);
+                    lat1 = place.geometry.location.lat();
+                    lng1 = place.geometry.location.lng();
+                }
+                map.fitBounds(bounds);
+                var defaultBounds1 = new google.maps.LatLngBounds(
+                        new google.maps.LatLng(lat1 - 0.5, lng1 - 0.5),
+                        new google.maps.LatLng(lat1 + 0.5, lng1 + 0.5));
+                map.fitBounds(defaultBounds1);
+            });
+        }
+    </script>
+    <div class="container">
+        <div class="row"style="margin-top: 50px">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="map_location" id="map_location" placeholder="Search Location" /><br>
+                    <input type="text" id="mylati" class="form-control" readonly=""/><br>
+                    <input type="text" id="mylongi" class="form-control" readonly=""/><br>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div id="map" style="width:100%;height:500px;border-radius: 10px"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function myMap(lat, lng) {
+            var mapCanvas = document.getElementById("map");
+            var myCenter = new google.maps.LatLng(lat, lng);
+            var mapOptions = {center: myCenter, zoom: 15};
+            var map = new google.maps.Map(mapCanvas, mapOptions);
+            var marker = new google.maps.Marker({
+                position: myCenter,
+                animation: google.maps.Animation.BOUNCE
+            });
+            marker.setMap(map);
+        }
+    </script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBYeyVAf4D2xq1NPskOIUEsbISxGJbGwy8&libraries=places&v=3.exp"></script>        
+</body>
+</html>
